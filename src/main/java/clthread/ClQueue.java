@@ -24,6 +24,7 @@ public class ClQueue {
     public void put(Runnable runnable){
         try{
             lock.lock();
+            log.debug("队列长度put-----"+deque.size());
             while (deque.size()==queueSize){
                 log.debug("队列中满了，在进来就要进行阻塞");
                 try {
@@ -35,6 +36,7 @@ public class ClQueue {
             log.debug("队列中没满，将线程加到队列中");
 
             deque.addLast(runnable);
+            emptyCondition.signal();
         }finally {
             lock.unlock();
         }
@@ -44,6 +46,8 @@ public class ClQueue {
     public Runnable poll(){
         try{
             lock.lock();
+
+            log.debug("队列长度poll----"+deque.size()+"---"+deque.isEmpty());
             if(deque.isEmpty()){
                 try {
                     emptyCondition.await();
@@ -52,8 +56,11 @@ public class ClQueue {
                 }
 
             }
-            emptyCondition.signal();
+            log.debug("从队列中取出一个线程处理");
+
+
             Runnable runnable = deque.removeFirst();
+            condition.signal();
             return runnable;
         }finally {
             lock.unlock();

@@ -29,10 +29,11 @@ public class ClThreadPoll {
     }
 
     public void submit(Runnable runnable) {
+        log.debug("set.size()---"+set.size());
 
         if (set.size() < core) {
             log.debug("线程池里线程未满，可以继续执行 new一个线程");
-            ClNode clNode = new ClNode(runnable, "Thread" + set.size() + 1,this);
+            ClNode clNode = new ClNode(runnable, "Thread" + set.size(),this);
             set.add(clNode);
             clNode.start();
         } else {
